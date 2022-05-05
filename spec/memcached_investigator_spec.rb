@@ -5,7 +5,7 @@ RSpec.describe MemcachedInvestigator do
     expect(MemcachedInvestigator::VERSION).not_to be nil
   end
 
-  it "does something useful" do
-    expect(false).to eq(true)
+  it "stats test" do
+    expect{MemcachedInvestigator::Client.new.stats}.to output.to_stdout
   end
 end
