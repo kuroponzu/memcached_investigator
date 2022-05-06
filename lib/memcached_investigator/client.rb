@@ -1,4 +1,5 @@
 require 'socket'
+require "csv"
 
 module MemcachedInvestigator
   class Client
@@ -79,6 +80,17 @@ module MemcachedInvestigator
       sock.write("flush_all\r\n")
       response = sock.readline(chomp: true)
       p response
+    end
+
+    def import(csv_file:)
+      if File.file?(csv_file)
+        table = CSV.read(csv_file, headers: true)
+        table.each do |row|
+          set(key: row['key'], value: row['value'], **row.to_h)
+        end
+      else
+        p "File is not found #{csv_file}"
+      end
     end
 
     private def display_response
