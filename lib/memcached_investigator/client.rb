@@ -14,6 +14,10 @@ module MemcachedInvestigator
       @sock = TCPSocket.new(hostname, port)
     end
 
+    def socket_write(args)
+      sock.write(args)
+    end
+
     def stats(args: "")
       if args == "" || ENABLE_STATS_ARGS.include?(args)
         sock.write("stats #{args}\r\n")
@@ -83,6 +87,11 @@ module MemcachedInvestigator
       sock.write("flush_all\r\n")
       response = sock.readline(chomp: true)
       p response
+    end
+
+    def metadump_all
+      sock.write("lru_crawler metadump all\r\n")
+      display_response
     end
 
     def import(csv_file:)
