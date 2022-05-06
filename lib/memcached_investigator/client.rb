@@ -13,12 +13,17 @@ module MemcachedInvestigator
       display_response
     end
 
-    def get(key)
+    def stats(args: "")
+      sock.write("stats #{args}\r\n")
+      display_response
+    end
+
+    def get(key:)
       sock.write("get #{key}\r\n")
       display_response
     end
 
-    def gets(key)
+    def gets(key:)
       sock.write("gets #{key}\r\n")
       display_response
     end
@@ -69,9 +74,10 @@ module MemcachedInvestigator
       display_response
     end
 
-    def flush_all(key:)
+    def flush_all
       sock.write("flush_all\r\n")
-      display_response
+      response = sock.readline(chomp: true)
+      p response
     end
 
     private def display_response
