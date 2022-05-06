@@ -5,7 +5,10 @@ module MemcachedInvestigator
   class Client
     attr_accessor :sock
 
-    ENABLE_STATS_ARGS = ['settings', 'items', 'slabs', 'sizes'].freeze
+    ENABLE_STATS_ARGS = [
+      'settings', 'items', 'slabs', 'sizes','detail on',
+      'detail off','detail dump','cachedump','conns','exstore','reset'
+    ].freeze
 
     def initialize(hostname: 'localhost', port: 11211)
       @sock = TCPSocket.new(hostname, port)
