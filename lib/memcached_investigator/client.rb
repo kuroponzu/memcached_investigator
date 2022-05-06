@@ -4,18 +4,19 @@ module MemcachedInvestigator
   class Client
     attr_accessor :sock
 
+    ENABLE_STATS_ARGS = ['settings', 'items', 'slabs', 'sizes'].freeze
+
     def initialize(hostname: 'localhost', port: 11211)
       @sock = TCPSocket.new(hostname, port)
     end
 
-    def stats
-      sock.write("stats\r\n")
-      display_response
-    end
-
     def stats(args: "")
-      sock.write("stats #{args}\r\n")
-      display_response
+      if args == "" || ENABLE_STATS_ARGS.include?(args)
+        sock.write("stats #{args}\r\n")
+        display_response
+      else
+        p "Invalid argments. Enable argments #{ENABLE_STATS_ARGS}"
+      end
     end
 
     def get(key:)
