@@ -10,6 +10,20 @@ module MemcachedInvestigator
       'detail off','detail dump','cachedump','conns','exstore','reset'
     ].freeze
 
+    STORAGE_COMMAND = [
+      'set', 'add', 'replace', 'append', 'prepend', 'cas'
+    ].freeze
+
+    STORAGE_COMMAND.each do |command|
+      define_method(command) do |key:, value:, **option|
+        flag = option[:flag] || 0
+        expire = option[:expire] || (Time.now.to_i + 3600)
+        size = value.bytesize
+        socket_write("#{command} #{key} #{flag} #{expire} #{size} \r\n#{value}\r\n")
+        socket_readline
+      end
+    end
+
     def initialize(hostname: 'localhost', port: 11211)
       @sock = TCPSocket.new(hostname, port)
     end
@@ -27,73 +41,33 @@ module MemcachedInvestigator
         sock.write("stats #{args}\r\n")
         display_response
       else
-        p "Invalid argments. Enable argments #{ENABLE_STATS_ARGS}"
+        "Invalid argments. Enable argments #{ENABLE_STATS_ARGS}"
       end
     end
 
     def get(key:)
-      sock.write("get #{key}\r\n")
+      socket_write("get #{key}\r\n")
       display_response
     end
 
     def gets(key:)
-      sock.write("gets #{key}\r\n")
+      socket_write("gets #{key}\r\n")
       display_response
     end
 
-    def set(key:, value:, **option)
-      flag = option[:flag] || 0
-      expire = option[:expire] || (Time.now.to_i + 3600)
-      size = value.bytesize
-      sock.write("set #{key} #{flag} #{expire} #{size} \r\n#{value}\r\n")
-      sock.readline(chomp: true)
-    end
-
-    def add(key:, value:, **option)
-      flag = option[:flag] || 0
-      expire = option[:expire] || (Time.now.to_i + 3600)
-      size = value.bytesize
-      sock.write("add #{key} #{flag} #{expire} #{size} \r\n#{value}\r\n")
-      sock.readline(chomp: true)
-    end
-
-    def replace(key:, value:, **option)
-      flag = option[:flag] || 0
-      expire = option[:expire] || (Time.now.to_i + 3600)
-      size = value.bytesize
-      sock.write("replace #{key} #{flag} #{expire} #{size} \r\n#{value}\r\n")
-      sock.readline(chomp: true)
-    end
-
-    def append(key:, size:, **option)
-      flag = option[:flag] || 0
-      expire = option[:expire] || (Time.now.to_i + 3600)
-      size = value.bytesize
-      sock.write("append #{key} #{flag} #{expire} #{size} \r\n#{value}\r\n")
-      sock.readline(chomp: true)
-    end
-
-    def prepend(key:, size:, **option)
-      flag = option[:flag] || 0
-      expire = option[:expire] || (Time.now.to_i + 3600)
-      size = value.bytesize
-      sock.write("prepend #{key} #{flag} #{expire} #{size} \r\n#{value}\r\n")
-      sock.readline(chomp: true)
-    end
-
     def delete(key:)
-      sock.write("delete #{key}\r\n")
+      socket_write("delete #{key}\r\n")
       sock.readline(chomp: true)
     end
 
     def flush_all
-      sock.write("flush_all\r\n")
+      socket_write("flush_all\r\n")
       sock.readline(chomp: true)
     end
 
     def metadump_all
       if "1.4.34" < memcached_version
-        sock.write("lru_crawler metadump all\r\n")
+        socket_write("lru_crawler metadump all\r\n")
         display_response
       else
         "Not support metadump for this version"
@@ -113,7 +87,7 @@ module MemcachedInvestigator
 
     def export_metadump_all
       export_data = []
-      sock.write("lru_crawler metadump all\r\n")
+      socket_write("lru_crawler metadump all\r\n")
       loop do
         response = sock.readline(chomp: true)
         break if response.include?('END')
@@ -133,9 +107,9 @@ module MemcachedInvestigator
 
     def delete_never_expires_data
       never_expires_data_keys = []
-      sock.write("lru_crawler metadump all\r\n")
+      socket_write("lru_crawler metadump all\r\n")
       loop do
-        response = sock.readline(chomp: true)
+        response = socket_readline
         break if response.include?('END')
         # Note
         # ❯ echo 'lru_crawler metadump all' | nc localhost 11211
