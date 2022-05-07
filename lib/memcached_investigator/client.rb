@@ -83,7 +83,7 @@ module MemcachedInvestigator
 
     def delete(key:)
       sock.write("delete #{key}\r\n")
-      display_response
+      sock.readline(chomp: true)
     end
 
     def flush_all
@@ -128,6 +128,25 @@ module MemcachedInvestigator
         export_data.each do |ed|
           csv << ed
         end
+      end
+    end
+
+    def delete_never_expires_data
+      never_expires_data_keys = []
+      sock.write("lru_crawler metadump all\r\n")
+      loop do
+        response = sock.readline(chomp: true)
+        break if response.include?('END')
+        # Note
+        # ❯ echo 'lru_crawler metadump all' | nc localhost 11211
+        # key=test exp=1651829132 la=1651786446 cas=13 fetch=yes cls=1 size=71
+        array_response = response.split(' ')
+        if 1 > array_response[1].sub(/exp=/,'').to_i
+          never_expires_data_keys << array_response[0].sub(/key=/,'')
+        end
+      end
+      never_expires_data_keys.each do |never_expires_data_key|
+        delete(key: never_expires_data_key)
       end
     end
 
