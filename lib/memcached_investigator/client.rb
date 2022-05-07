@@ -66,12 +66,9 @@ module MemcachedInvestigator
     end
 
     def metadump_all
-      if "1.4.34" < memcached_version
-        socket_write("lru_crawler metadump all\r\n")
-        display_response
-      else
-        "Not support metadump for this version"
-      end
+      return 'Not support metadump for this version' unless enable_metadump?
+      socket_write("lru_crawler metadump all\r\n")
+      display_response
     end
 
     def import(csv_file:)
@@ -86,6 +83,7 @@ module MemcachedInvestigator
     end
 
     def export_metadump_all
+      return 'Not support metadump for this version' unless enable_metadump?
       export_data = []
       socket_write("lru_crawler metadump all\r\n")
       loop do
@@ -136,6 +134,10 @@ module MemcachedInvestigator
         p response
         break if response.include?('END')
       end
+    end
+
+    private def enable_metadump?
+      "1.4.34" < memcached_version
     end
   end
 end
