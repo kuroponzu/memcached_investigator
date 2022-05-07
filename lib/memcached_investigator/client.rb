@@ -71,6 +71,12 @@ module MemcachedInvestigator
       display_response
     end
 
+    # NOTE: CSV format
+    # key,value,flag,expire
+    # hoge1,huga1,0,5000
+    # hoge2,huga2,0,0
+    # hoge3,huga3,0,10000
+
     def import(csv_file:)
       if File.file?(csv_file)
         table = CSV.read(csv_file, headers: true)
