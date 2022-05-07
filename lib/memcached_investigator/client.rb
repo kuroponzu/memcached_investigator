@@ -18,6 +18,10 @@ module MemcachedInvestigator
       sock.write(args)
     end
 
+    def socket_readline
+      sock.readline(chomp: true)
+    end
+
     def stats(args: "")
       if args == "" || ENABLE_STATS_ARGS.include?(args)
         sock.write("stats #{args}\r\n")
@@ -90,8 +94,12 @@ module MemcachedInvestigator
     end
 
     def metadump_all
-      sock.write("lru_crawler metadump all\r\n")
-      display_response
+      if "1.4.34" < memcached_version
+        sock.write("lru_crawler metadump all\r\n")
+        display_response
+      else
+        "Not support metadump for this version"
+      end
     end
 
     def import(csv_file:)
@@ -103,6 +111,12 @@ module MemcachedInvestigator
       else
         p "File is not found #{csv_file}"
       end
+    end
+
+    def memcached_version
+      socket_write("version\r\n")
+      response = socket_readline
+      response.delete("VERSION").strip
     end
 
     private def display_response
