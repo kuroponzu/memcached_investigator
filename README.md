@@ -1,8 +1,6 @@
 # MemcachedInvestigator
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/memcached_investigator`. To experiment with that code, run `bin/console` for an interactive prompt.
-
-TODO: Delete this and the text above, and describe your gem
+A simple memcached client for research, debugging
 
 ## Installation
 
@@ -16,7 +14,20 @@ If bundler is not being used to manage dependencies, install the gem by executin
 
 ## Usage
 
-TODO: Write usage instructions here
+```
+client = MemcachedInvestigator::Client.new
+client.add(key: "cache",value: "cached")
+=> "STORED"
+client.metadump_all
+"key=cache exp=1651903111 la=1651838152 cas=39 fetch=no cls=1 size=70"
+"END"
+=> nil
+client.flush_all
+=> "OK"
+client.metadump_all
+"END"
+=> nil
+```
 
 ## Development
 
