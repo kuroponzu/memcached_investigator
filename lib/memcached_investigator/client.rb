@@ -113,6 +113,26 @@ module MemcachedInvestigator
       end
     end
 
+    def export_metadump_all
+      export_data = []
+      sock.write("lru_crawler metadump all\r\n")
+      loop do
+        response = sock.readline(chomp: true)
+        break if response.include?('END')
+        # Note
+        # ❯ echo 'lru_crawler metadump all' | nc localhost 11211
+        # key=test exp=1651829132 la=1651786446 cas=13 fetch=yes cls=1 size=71
+        array_response = response.sub(/key=/,'').sub(/exp=/,'').sub(/la=/,'').sub(/cas=/,'').sub(/fetch=/,'').sub(/cls=/,'').sub(/size=/,'').split(' ')
+        export_data << array_response
+      end
+      CSV.open('metadump.csv','wb') do |csv|
+        csv << ['key','exp','la','cas','fetch','cls','size']
+        export_data.each do |ed|
+          csv << ed
+        end
+      end
+    end
+
     def memcached_version
       socket_write("version\r\n")
       response = socket_readline
