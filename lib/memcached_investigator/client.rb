@@ -47,7 +47,7 @@ module MemcachedInvestigator
       size = value.bytesize
       sock.write("set #{key} #{flag} #{expire} #{size} \r\n#{value}\r\n")
       response = sock.readline(chomp: true)
-      p response
+      response
     end
 
     def add(key:, size:, **option)
@@ -55,7 +55,7 @@ module MemcachedInvestigator
       expire = option[:expire] || (Time.now.to_i + 3600)
       sock.write("set #{key} #{flag} #{expire} #{size}\r\n")
       response = sock.readline(chomp: true)
-      p response
+      response
     end
 
     def replace(key:, size:, **option)
@@ -63,7 +63,7 @@ module MemcachedInvestigator
       expire = option[:expire] || (Time.now.to_i + 3600)
       sock.write("set #{key} #{flag} #{expire} #{size}\r\n")
       response = sock.readline(chomp: true)
-      p response
+      response
     end
 
     def append(key:, size:, **option)
@@ -71,7 +71,7 @@ module MemcachedInvestigator
       expire = option[:expire] || (Time.now.to_i + 3600)
       sock.write("apend #{key} #{flag} #{expire} #{size}\r\n")
       response = sock.readline(chomp: true)
-      p response
+      response
     end
 
     def prepend(key:, size:, **option)
@@ -79,7 +79,7 @@ module MemcachedInvestigator
       expire = option[:expire] || (Time.now.to_i + 3600)
       sock.write("prepend #{key} #{flag} #{expire} #{size}\r\n")
       response = sock.readline(chomp: true)
-      p response
+      response
     end
 
     def delete(key:)
@@ -90,7 +90,7 @@ module MemcachedInvestigator
     def flush_all
       sock.write("flush_all\r\n")
       response = sock.readline(chomp: true)
-      p response
+      response
     end
 
     def metadump_all
@@ -109,7 +109,7 @@ module MemcachedInvestigator
           set(key: row['key'], value: row['value'], **row.to_h)
         end
       else
-        p "File is not found #{csv_file}"
+        "File is not found #{csv_file}"
       end
     end
 
