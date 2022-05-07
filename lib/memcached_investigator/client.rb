@@ -46,40 +46,39 @@ module MemcachedInvestigator
       expire = option[:expire] || (Time.now.to_i + 3600)
       size = value.bytesize
       sock.write("set #{key} #{flag} #{expire} #{size} \r\n#{value}\r\n")
-      response = sock.readline(chomp: true)
-      response
+      sock.readline(chomp: true)
     end
 
-    def add(key:, size:, **option)
+    def add(key:, value:, **option)
       flag = option[:flag] || 0
       expire = option[:expire] || (Time.now.to_i + 3600)
-      sock.write("set #{key} #{flag} #{expire} #{size}\r\n")
-      response = sock.readline(chomp: true)
-      response
+      size = value.bytesize
+      sock.write("add #{key} #{flag} #{expire} #{size} \r\n#{value}\r\n")
+      sock.readline(chomp: true)
     end
 
-    def replace(key:, size:, **option)
+    def replace(key:, value:, **option)
       flag = option[:flag] || 0
       expire = option[:expire] || (Time.now.to_i + 3600)
-      sock.write("set #{key} #{flag} #{expire} #{size}\r\n")
-      response = sock.readline(chomp: true)
-      response
+      size = value.bytesize
+      sock.write("replace #{key} #{flag} #{expire} #{size} \r\n#{value}\r\n")
+      sock.readline(chomp: true)
     end
 
     def append(key:, size:, **option)
       flag = option[:flag] || 0
       expire = option[:expire] || (Time.now.to_i + 3600)
-      sock.write("apend #{key} #{flag} #{expire} #{size}\r\n")
-      response = sock.readline(chomp: true)
-      response
+      size = value.bytesize
+      sock.write("append #{key} #{flag} #{expire} #{size} \r\n#{value}\r\n")
+      sock.readline(chomp: true)
     end
 
     def prepend(key:, size:, **option)
       flag = option[:flag] || 0
       expire = option[:expire] || (Time.now.to_i + 3600)
-      sock.write("prepend #{key} #{flag} #{expire} #{size}\r\n")
-      response = sock.readline(chomp: true)
-      response
+      size = value.bytesize
+      sock.write("prepend #{key} #{flag} #{expire} #{size} \r\n#{value}\r\n")
+      sock.readline(chomp: true)
     end
 
     def delete(key:)
@@ -89,8 +88,7 @@ module MemcachedInvestigator
 
     def flush_all
       sock.write("flush_all\r\n")
-      response = sock.readline(chomp: true)
-      response
+      sock.readline(chomp: true)
     end
 
     def metadump_all
