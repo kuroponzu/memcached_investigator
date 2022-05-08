@@ -81,7 +81,7 @@ module MemcachedInvestigator
       raise FileNotFoundError.new("File is not found #{csv_file}") unless File.file?(csv_file)
       table = CSV.read(csv_file, headers: true)
       table.each do |row|
-        set(key: row[:key], value: row[:value], **row.to_h)
+        set(key: row['key'], value: row['value'], **row.to_h)
       end
     end
 
