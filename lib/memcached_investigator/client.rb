@@ -78,13 +78,10 @@ module MemcachedInvestigator
     # hoge3,huga3,0,10000
 
     def import(csv_file:)
-      if File.file?(csv_file)
-        table = CSV.read(csv_file, headers: true)
-        table.each do |row|
-          set(key: row['key'], value: row['value'], **row.to_h)
-        end
-      else
-        "File is not found #{csv_file}"
+      raise FileNotFoundError.new("File is not found #{csv_file}") unless File.file?(csv_file)
+      table = CSV.read(csv_file, headers: true)
+      table.each do |row|
+        set(key: row['key'], value: row['value'], **row.to_h)
       end
     end
 
@@ -135,11 +132,14 @@ module MemcachedInvestigator
     end
 
     private def display_response
+      response = ""
       loop do
-        response = sock.readline(chomp: true)
-        p response
-        break if response.include?('END')
+        res = sock.readline(chomp: true)
+        p res
+        response << res << "\n"
+        break if res.include?('END')
       end
+      response
     end
 
     private def enable_metadump?
