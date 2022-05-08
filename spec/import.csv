@@ -1,0 +1,4 @@
+key,value,flag,expire
+test-import-key1,test-import-value1,0,5000
+test-import-key2,test-import-value2,0,0
+test-import-key3,test-import-value3,0,10000
