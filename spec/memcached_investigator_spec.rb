@@ -1,7 +1,9 @@
 # frozen_string_literal: true
 
 RSpec.describe MemcachedInvestigator do
-  let(:client) { MemcachedInvestigator::Client.new }
+  let(:memcached_host) { ENV.fetch('memcached_host', 'localhost')}
+  let(:memcached_port) { ENV.fetch('memcached_port', 11211)}
+  let(:client) { MemcachedInvestigator::Client.new(hostname: memcached_host, port: memcached_port) }
   let(:stdout_ok) {"OK"}
   let(:stdout_not_found) {"NOT_FOUND"}
   let(:stdout_deleted) {"DELETED"}
