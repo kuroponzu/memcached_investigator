@@ -11,7 +11,7 @@ Gem::Specification.new do |spec|
   spec.summary = "To resarch memcached"
   spec.description = "Exec stats to memcached by this gem"
   spec.homepage = "https://github.com/kuroponzu/memcached_investigator"
-  spec.required_ruby_version = ">= 2.6.0"
+  spec.required_ruby_version = ">= 2.6.10"
 
   spec.metadata["allowed_push_host"] = "https://rubygems.org"
 
